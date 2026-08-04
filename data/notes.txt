@@ -1,0 +1,5 @@
+Artificial Intelligence (AI) is transforming industries by enabling machines to perform tasks that typically require human intelligence.
+
+Machine Learning is a subset of AI that focuses on learning patterns from data.
+
+Retrieval-Augmented Generation (RAG) combines language models with external knowledge bases to produce more accurate responses.
