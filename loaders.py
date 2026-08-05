@@ -1,13 +1,10 @@
 import os
+from config import DATA_FOLDER
 
 from langchain_community.document_loaders import (
     TextLoader,
     PyPDFLoader,
 )
-
-
-DATA_FOLDER = "data"
-
 
 def load_documents():
 

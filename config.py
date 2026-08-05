@@ -1,0 +1,11 @@
+DATA_FOLDER = "data"
+
+CHUNK_SIZES = [200, 500, 1000]
+
+DEFAULT_CHUNK_SIZE = 500
+
+CHUNK_OVERLAP = 50
+
+TOP_K = 3
+
+VECTOR_DB = "chroma_db"

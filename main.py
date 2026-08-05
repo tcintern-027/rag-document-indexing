@@ -1,74 +1,68 @@
+from config import (
+    DEFAULT_CHUNK_SIZE,
+    TOP_K,
+    VECTOR_DB,
+)
+
 from loaders import load_documents
 from splitter import split_documents
 from embeddings import create_embeddings
+
 from vector_store import (
     create_vector_store,
-    verify_vector_store
+    verify_vector_store,
+)
+
+from retriever import (
+    create_retriever,
+    retrieve_documents,
+    display_documents,
 )
 
 
 def main():
 
     print("Loading documents...")
-
     documents = load_documents()
+    print(f"Loaded {len(documents)} document(s)")
 
-    print(
-        f"Loaded {len(documents)} document(s)"
+    print("\nSplitting documents...")
+    chunks = split_documents(
+        documents,
+        DEFAULT_CHUNK_SIZE,
     )
-
+    print(f"Created {len(chunks)} chunks")
 
     embeddings = create_embeddings()
 
-
-    chunk_sizes = [200, 500, 1000]
-
-
-    print("\nChunk Size Comparison")
-    print("=" * 40)
-
-
-    for size in chunk_sizes:
-
-        print(
-            f"\nTesting chunk size: {size}"
-        )
-
-
-        chunks = split_documents(
-            documents,
-            size
-        )
-
-
-        db_name = f"chroma_db_{size}"
-
-
-        vector_store = create_vector_store(
-            chunks,
-            embeddings,
-            db_name
-        )
-
-
-        count = verify_vector_store(
-            vector_store
-        )
-
-
-        print(
-            f"Chunks created: {len(chunks)}"
-        )
-
-        print(
-            f"Vectors stored: {count}"
-        )
-
-
-    print(
-        "\nDocument indexing completed successfully!"
+    print("\nCreating ChromaDB...")
+    vector_store = create_vector_store(
+        chunks,
+        embeddings,
+        VECTOR_DB,
     )
 
+    count = verify_vector_store(vector_store)
+    print(f"Vectors stored: {count}")
+
+    retriever = create_retriever(
+        vector_store,
+        TOP_K,
+    )
+
+    while True:
+
+        query = input("\nEnter your question (or 'exit'): ")
+
+        if query.lower() == "exit":
+            break
+
+        results = retrieve_documents(
+            retriever,
+            query,
+        )
+
+        display_documents(results)
 
 
 if __name__ == "__main__":
