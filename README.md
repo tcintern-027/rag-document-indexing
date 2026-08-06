@@ -1,121 +1,118 @@
-# RAG Document Indexing and Retrieval System
+# RAG Document Indexing & Chatbot with ChromaDB and Groq
 
-A complete document processing pipeline built to understand the core concepts behind **Retrieval-Augmented Generation (RAG)** systems.
+A complete Retrieval-Augmented Generation (RAG) application that allows users to ask questions about their own documents. The system retrieves relevant document chunks from a ChromaDB vector database and uses Groq-powered LLM generation to produce grounded answers based only on the provided knowledge base.
 
-This project implements the two important stages of a RAG application:
+---
 
-1. **Document Indexing**
+# Project Overview
 
-   * Loading documents
-   * Splitting text into chunks
-   * Generating embeddings
-   * Storing vectors in ChromaDB
+Traditional LLMs generate answers based on their pre-trained knowledge. However, they may lack information about private or custom documents.
 
-2. **Document Retrieval**
+This project implements a RAG pipeline where:
 
-   * Creating a retriever
-   * Accepting user queries
-   * Performing similarity search
-   * Retrieving relevant document chunks
-   * Displaying retrieved context
-
-The project prepares the foundation required before connecting an LLM and building a complete RAG chatbot.
+1. Documents are loaded from local files.
+2. Documents are split into smaller chunks.
+3. Chunks are converted into vector embeddings.
+4. Embeddings are stored in ChromaDB.
+5. User queries are matched with relevant chunks using similarity search.
+6. Retrieved context is injected into a prompt.
+7. Groq LLM generates a grounded response.
 
 ---
 
 # Features
 
-## Document Indexing
-
-* Load multiple document formats:
-
-  * TXT files
-  * PDF files
-  * Markdown files
-
-* Split documents into meaningful chunks
-
-* Generate vector embeddings using HuggingFace models
-
-* Store embeddings in ChromaDB
-
-* Verify stored vectors
-
----
-
-## Retrieval Pipeline
-
-* Load indexed documents from ChromaDB
-
-* Create a LangChain Retriever
-
-* Accept user queries
-
-* Perform semantic similarity search
-
-* Retrieve the most relevant document chunks
-
-* Display retrieved context without LLM generation
-
----
-
-## Experiments
-
-* Compare different chunk sizes:
-
-  * 200
-  * 500
-  * 1000
-
-* Compare different Top-K retrieval values:
-
-  * 2
-  * 4
-  * 6
+:white_check_mark: Load TXT, PDF, and Markdown documents
+:white_check_mark: Document chunking and preprocessing
+:white_check_mark: Generate embeddings using HuggingFace models
+:white_check_mark: Store embeddings in ChromaDB
+:white_check_mark: Persistent vector database support
+:white_check_mark: Similarity-based retrieval
+:white_check_mark: Configurable Top-K retrieval
+:white_check_mark: Context injection into prompts
+:white_check_mark: Groq LLM integration
+:white_check_mark: Display retrieved document chunks
+:white_check_mark: Fully functional RAG chatbot
 
 ---
 
 # RAG Architecture
 
-The implemented pipeline:
-
 ```
-                 INDEXING PIPELINE
+                 DOCUMENT INDEXING
 
-Documents
-    |
-    ↓
-Document Loaders
-    |
-    ↓
-Text Splitting
-    |
-    ↓
-Embedding Generation
-    |
-    ↓
-ChromaDB Vector Storage
+ TXT / PDF / MD Files
+          |
+          ↓
+ Document Loaders
+          |
+          ↓
+ Text Splitter
+          |
+          ↓
+ Embedding Model
+          |
+          ↓
+ ChromaDB Vector Store
 
 
-                RETRIEVAL PIPELINE
 
-User Query
-    |
-    ↓
-Query Embedding
-    |
-    ↓
-Retriever
-    |
-    ↓
-Similarity Search
-    |
-    ↓
-Top-K Relevant Chunks
-    |
-    ↓
-Retrieved Context
+                 RETRIEVAL PIPELINE
+
+ User Question
+          |
+          ↓
+ Retriever
+          |
+          ↓
+ Similarity Search
+          |
+          ↓
+ Top-K Relevant Chunks
+
+
+
+                 GENERATION PIPELINE
+
+ Retrieved Context
+          +
+ User Query
+          |
+          ↓
+ Prompt Template
+          |
+          ↓
+ Groq LLM
+          |
+          ↓
+ Grounded AI Response
 ```
+
+---
+
+# Technologies Used
+
+## Backend
+
+* Python
+* LangChain
+* LangChain Chroma
+* Groq API
+* ChromaDB
+
+## AI Components
+
+* HuggingFace Sentence Transformers
+* Vector Embeddings
+* Retrieval-Augmented Generation (RAG)
+* Large Language Models (LLMs)
+
+## Document Processing
+
+* PDF Loader
+* Text Loader
+* Markdown Loader
+* Text Splitters
 
 ---
 
@@ -126,52 +123,33 @@ rag-document-indexing/
 
 │
 ├── data/
+│   ├── guide.pdf
 │   ├── notes.txt
-│   ├── tutorial.md
-│   └── guide.pdf
+│   └── tutorial.md
 │
-├── main.py                 # Main indexing and retrieval application
-├── experiments.py          # Chunk size and Top-K experiments
-│
+├── main.py                 # Application entry point
 ├── loaders.py              # Document loading logic
 ├── splitter.py             # Text chunking logic
 ├── embeddings.py           # Embedding model setup
-├── vector_store.py         # ChromaDB operations
-├── retriever.py            # Retrieval pipeline
-├── config.py               # Project configuration
+├── vector_store.py         # ChromaDB creation/loading
+├── retriever.py            # Similarity search logic
+├── prompt.py               # Prompt template
+├── chatbot.py              # Groq LLM integration
+├── experiments.py          # Chunk size experiments
+├── config.py               # Configuration values
+│
+├── chroma_db/              # Persistent vector database
 │
 ├── requirements.txt
 ├── README.md
-└── .gitignore
-```
-
----
-
-# Technologies Used
-
-## Programming Language
-
-* Python
-
-## Frameworks and Libraries
-
-* LangChain
-* LangChain Community
-* LangChain Text Splitters
-* HuggingFace Sentence Transformers
-* ChromaDB
-
-## Embedding Model
-
-```
-sentence-transformers/all-MiniLM-L6-v2
+└── .env
 ```
 
 ---
 
 # Installation
 
-## Clone Repository
+## 1. Clone Repository
 
 ```bash
 git clone <repository-url>
@@ -181,9 +159,7 @@ cd rag-document-indexing
 
 ---
 
-## Create Virtual Environment
-
-Windows:
+## 2. Create Virtual Environment
 
 ```bash
 python -m venv venv
@@ -191,13 +167,15 @@ python -m venv venv
 
 Activate:
 
-```bash
+### Windows
+
+```powershell
 venv\Scripts\activate
 ```
 
 ---
 
-## Install Dependencies
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -205,326 +183,309 @@ pip install -r requirements.txt
 
 ---
 
+# Environment Variables
+
+Create a `.env` file:
+
+```
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+The API key is used to communicate with Groq LLM models.
+
+---
+
 # Running the Application
 
-Run:
+Start the RAG chatbot:
 
 ```bash
 python main.py
 ```
 
-The application will:
-
-1. Load documents from the `data` folder
-2. Split documents into chunks
-3. Generate embeddings
-4. Store vectors in ChromaDB
-5. Create a retriever
-6. Accept user queries
-7. Display the most relevant document context
-
----
-
-# Document Loading
-
-The system supports multiple file formats.
-
-## TXT Files
-
-Loaded using:
-
-```
-TextLoader
-```
-
 Example:
 
 ```
-notes.txt
-```
+RAG Chatbot Ready!
+Type 'exit' to quit.
 
----
-
-## PDF Files
-
-Loaded using:
-
-```
-PyPDFLoader
-```
-
-Example:
-
-```
-guide.pdf
-```
-
----
-
-## Markdown Files
-
-Markdown documents are loaded as text files.
-
-Example:
-
-```
-tutorial.md
-```
-
----
-
-# Components
-
-## Document Loader
-
-File:
-
-```
-loaders.py
-```
-
-Responsible for reading different document formats and converting them into LangChain Document objects.
-
----
-
-## Text Splitter
-
-File:
-
-```
-splitter.py
-```
-
-Uses:
-
-```
-RecursiveCharacterTextSplitter
-```
-
-Configuration:
-
-```
-chunk_overlap = 50
-```
-
-Splitting documents improves retrieval accuracy by creating smaller searchable sections.
-
----
-
-## Embedding Generation
-
-File:
-
-```
-embeddings.py
-```
-
-Converts text chunks into numerical vector representations.
-
-Example:
-
-```
-Text
- |
- ↓
-Embedding Model
- |
- ↓
-[0.23, 0.54, -0.12, ...]
-```
-
----
-
-## Vector Database
-
-File:
-
-```
-vector_store.py
-```
-
-Handles:
-
-* Creating ChromaDB collections
-* Storing embeddings
-* Loading vector stores
-* Verifying stored vectors
-
----
-
-# Retrieval Pipeline
-
-File:
-
-```
-retriever.py
-```
-
-The retriever connects the user query with the vector database.
-
-The retrieval process:
-
-```
-User Question
-
-"What is machine learning?"
-
-        ↓
-
-Convert query into embedding
-
-        ↓
-
-Compare with stored vectors
-
-        ↓
-
-Return most similar chunks
-```
-
----
-
-# Similarity Search
-
-Similarity search finds document chunks that are closest to the user's query in vector space.
-
-Example:
-
-Query:
-
-```
+Enter your question:
 What is artificial intelligence?
 ```
 
-Retrieved chunks:
+Output:
 
 ```
-Artificial intelligence allows computers to perform tasks requiring human intelligence.
+Retrieved Context
+-----------------
 
-Machine learning is a subset of artificial intelligence.
+Artificial Intelligence (AI) is transforming industries by enabling machines to perform tasks that typically require human intelligence.
+
+
+AI Answer
+---------
+
+Artificial Intelligence is the field of creating machines that can perform tasks requiring human intelligence.
 ```
+
+---
+
+# How the System Works
+
+## 1. Document Loading
+
+Supported formats:
+
+* PDF
+* TXT
+* Markdown
+
+Example:
+
+```
+data/
+ |
+ ├── guide.pdf
+ ├── notes.txt
+ └── tutorial.md
+```
+
+Documents are converted into LangChain Document objects.
+
+---
+
+## 2. Text Splitting
+
+Large documents are divided into smaller chunks.
+
+Example:
+
+```
+Original Document
+
+        |
+        ↓
+
+Chunk 1
+Chunk 2
+Chunk 3
+```
+
+Chunking improves retrieval accuracy because the system searches smaller meaningful sections instead of entire documents.
+
+---
+
+## 3. Embeddings
+
+Each chunk is converted into a numerical vector representation.
+
+Example:
+
+```
+Text:
+
+"Machine Learning is a subset of AI"
+
+
+Embedding:
+
+[0.234, -0.421, 0.765, ...]
+```
+
+These vectors capture semantic meaning.
+
+---
+
+## 4. ChromaDB Storage
+
+The generated embeddings are stored in ChromaDB.
+
+Example:
+
+```
+Vector Database
+
+Vector              Source
+--------------------------------
+Embedding 1         notes.txt
+Embedding 2         tutorial.md
+Embedding 3         guide.pdf
+```
+
+The database is persistent, meaning embeddings do not need to be recreated every time.
+
+---
+
+## 5. Retrieval
+
+When a user asks a question:
+
+```
+Question:
+
+"What is AI?"
+```
+
+The retriever performs similarity search and finds the most relevant chunks.
+
+Example:
+
+```
+Retrieved:
+
+1. notes.txt
+2. tutorial.md
+3. guide.pdf
+```
+
+---
+
+## 6. Context Injection
+
+The retrieved chunks are inserted into the prompt:
+
+```
+Context:
+
+Artificial Intelligence enables machines...
+
+Question:
+
+What is AI?
+```
+
+The LLM receives both the question and supporting information.
+
+---
+
+## 7. Response Generation
+
+Groq LLM generates a response based on the retrieved context.
+
+This reduces hallucination because the model answers using the provided documents.
 
 ---
 
 # Top-K Retrieval Experiment
 
-The project compares different retrieval sizes.
+Top-K controls how many document chunks are retrieved.
 
-| Top-K | Result                         |
-| ----- | ------------------------------ |
-| 2     | Returns 2 most relevant chunks |
-| 4     | Returns 4 relevant chunks      |
-| 6     | Returns 6 relevant chunks      |
+Experiments were performed using different values.
 
-## Observation
+## Top-K = 2
 
-Smaller Top-K values:
+* Retrieves fewer chunks.
+* More precise results.
+* Less context.
 
-* Provide focused context
-* Reduce irrelevant information
+## Top-K = 4
 
-Larger Top-K values:
+* Balanced retrieval.
+* Good amount of context.
+* Better overall performance.
 
-* Provide more information
-* May include less relevant chunks
+## Top-K = 6
 
----
+* Retrieves more information.
+* May include less relevant chunks.
 
-# Chunk Size Experiment
-
-Different chunk sizes were tested:
-
-| Chunk Size | Purpose                      |
-| ---------- | ---------------------------- |
-| 200        | Smaller, more precise chunks |
-| 500        | Balanced retrieval           |
-| 1000       | Larger context chunks        |
-
-## Observation
-
-Smaller chunks generate more vectors and may improve precision.
-
-Larger chunks provide more context but may reduce retrieval accuracy.
-
-Choosing the correct chunk size depends on:
-
-* Document type
-* Query complexity
-* Retrieval requirements
-
----
-
-# Example Output
+Final configuration:
 
 ```
-Loading documents...
-Loaded 3 document(s)
-
-Splitting documents...
-Created 3 chunks
-
-Creating ChromaDB...
-Vectors stored: 3
-
-Enter your question:
-
-What is machine learning?
-
-Retrieved Context:
-
-Result 1:
-Machine learning is a subset of artificial intelligence...
-
-Result 2:
-Machine learning algorithms learn patterns from data...
+TOP_K = 3
 ```
+
+because it provides a balance between relevance and available context.
 
 ---
 
-# Current RAG Progress
+# Persistent ChromaDB Design
 
-Completed:
+The application separates indexing and retrieval.
+
+First execution:
 
 ```
 Documents
-    ↓
-Document Loading
-    ↓
-Chunking
-    ↓
+   ↓
+Chunks
+   ↓
 Embeddings
-    ↓
+   ↓
 ChromaDB
-    ↓
-Retriever
-    ↓
-Similarity Search
-    ↓
-Retrieved Context
+```
+
+Future executions:
+
+```
+Existing ChromaDB
+        ↓
+Load Database
+        ↓
+Start Chatbot
+```
+
+This avoids unnecessary embedding generation.
+
+---
+
+# Example Questions
+
+Try:
+
+```
+What is artificial intelligence?
+```
+
+```
+Explain machine learning.
+```
+
+```
+What is RAG?
+```
+
+```
+How does ChromaDB store documents?
 ```
 
 ---
 
 # Future Improvements
 
-* Connect retriever with an LLM
-* Build a complete RAG chatbot
-* Add conversational memory
-* Add metadata filtering
-* Support DOCX documents
-* Add RAG evaluation using LangSmith
-* Deploy as an API service
+Possible extensions:
+
+* Add web interface using React and Tailwind
+* Add streaming responses
+* Add conversation memory
+* Support more document formats
+* Add authentication
+* Add LangSmith tracing and evaluation
+* Deploy using Docker and cloud services
+
+---
+
+# Learning Outcomes
+
+Through this project, the following RAG concepts were implemented:
+
+:white_check_mark: Document Loading
+:white_check_mark: Text Chunking
+:white_check_mark: Embeddings
+:white_check_mark: Vector Databases
+:white_check_mark: ChromaDB
+:white_check_mark: Similarity Search
+:white_check_mark: Retrievers
+:white_check_mark: Top-K Retrieval
+:white_check_mark: Prompt Templates
+:white_check_mark: Context Injection
+:white_check_mark: LLM Integration
+:white_check_mark: Complete RAG Workflow
 
 ---
 
 # Author
 
-**Zarwan Zahid**
+Zarwan Zahid
 
-Computer Science Student | AI & Software Development Enthusiast
-
----
-
-# License
-
-This project is created for educational purposes and learning RAG fundamentals.
+RAG Document Indexing & Chatbot Project
