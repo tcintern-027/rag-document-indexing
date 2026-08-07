@@ -1,491 +1,225 @@
-# RAG Document Indexing & Chatbot with ChromaDB and Groq
+# 🧠 AI Knowledge Assistant — Full-Stack Grounded RAG Platform
 
-A complete Retrieval-Augmented Generation (RAG) application that allows users to ask questions about their own documents. The system retrieves relevant document chunks from a ChromaDB vector database and uses Groq-powered LLM generation to produce grounded answers based only on the provided knowledge base.
-
----
-
-# Project Overview
-
-Traditional LLMs generate answers based on their pre-trained knowledge. However, they may lack information about private or custom documents.
-
-This project implements a RAG pipeline where:
-
-1. Documents are loaded from local files.
-2. Documents are split into smaller chunks.
-3. Chunks are converted into vector embeddings.
-4. Embeddings are stored in ChromaDB.
-5. User queries are matched with relevant chunks using similarity search.
-6. Retrieved context is injected into a prompt.
-7. Groq LLM generates a grounded response.
+> A production-grade, portfolio-level Retrieval-Augmented Generation (RAG) SaaS application that converts static documents (PDF, TXT, Markdown) into an interactive, grounded AI knowledge assistant featuring source citations, raw context chunk inspection, markdown formatting, syntax highlighting, and sub-second inference powered by **FastAPI**, **ChromaDB**, **LangChain**, **HuggingFace**, **Groq LLM (Llama 3.3 70B)**, and **React 18 + TypeScript**.
 
 ---
 
-# Features
+## 🌟 Key Features
 
-:white_check_mark: Load TXT, PDF, and Markdown documents
-:white_check_mark: Document chunking and preprocessing
-:white_check_mark: Generate embeddings using HuggingFace models
-:white_check_mark: Store embeddings in ChromaDB
-:white_check_mark: Persistent vector database support
-:white_check_mark: Similarity-based retrieval
-:white_check_mark: Configurable Top-K retrieval
-:white_check_mark: Context injection into prompts
-:white_check_mark: Groq LLM integration
-:white_check_mark: Display retrieved document chunks
-:white_check_mark: Fully functional RAG chatbot
+- **⚡ Grounded AI Q&A Engine:** Generates zero-hallucination answers backed strictly by retrieved document context using Groq's high-speed `llama-3.3-70b-versatile` model.
+- **📝 Markdown & Code Highlighting:** Native rendering of markdown responses and syntax-highlighted code blocks using `react-markdown` and `react-syntax-highlighter` (`vscDarkPlus`).
+- **📚 Multi-Format Ingestion:** Drag-and-drop support for **PDF**, **TXT**, and **Markdown** files with automatic chunking and vector indexing.
+- **🔍 Vector Store Telemetry & Search:** Persistent HNSW vector indexing using ChromaDB with configurable top-K similarity search.
+- **📖 Interactive Source Citations:** Every answer displays clickable source references highlighting file names, page numbers, and preview snippets.
+- **👁️ Raw Context Inspection:** Full modal drawer allowing users to inspect exact raw text chunks retrieved for any answer.
+- **🎨 Award-Winning SaaS Interface:** Built with **React 18**, **TypeScript (`strict: true`)**, **Vite**, **Tailwind CSS**, and **Lucide Icons** featuring instant dark/light mode toggle, preset prompts, and responsive glassmorphic cards.
+- **🔌 OpenAPI & REST Architecture:** Fully documented FastAPI REST endpoints (`/chat`, `/upload`, `/health`, `/documents`) with Pydantic validation.
+- **🐳 Containerized & Cloud Ready:** Complete Docker Compose setup for backend and frontend deployment.
 
 ---
 
-# RAG Architecture
+## 🏗️ System Architecture
 
 ```
-                 DOCUMENT INDEXING
-
- TXT / PDF / MD Files
-          |
-          ↓
- Document Loaders
-          |
-          ↓
- Text Splitter
-          |
-          ↓
- Embedding Model
-          |
-          ↓
- ChromaDB Vector Store
-
-
-
-                 RETRIEVAL PIPELINE
-
- User Question
-          |
-          ↓
- Retriever
-          |
-          ↓
- Similarity Search
-          |
-          ↓
- Top-K Relevant Chunks
-
-
-
-                 GENERATION PIPELINE
-
- Retrieved Context
-          +
- User Query
-          |
-          ↓
- Prompt Template
-          |
-          ↓
- Groq LLM
-          |
-          ↓
- Grounded AI Response
+                                  USER INTERFACE
+          (React 18 + TypeScript + Tailwind CSS + react-markdown + Axios)
+                                         │
+                                         ▼ HTTP REST API
+                    ┌────────────────────────────────────────┐
+                    │            FASTAPI BACKEND             │
+                    │   (Routers, Lifespan, Pydantic)       │
+                    └───────────────────┬────────────────────┘
+                                        │
+                                        ▼
+                    ┌────────────────────────────────────────┐
+                    │               RAG SERVICE              │
+                    │  (App / Services / RAGService Singleton)│
+                    └───────┬───────────────┬───────────────┬┘
+                            │               │               │
+                            ▼               ▼               ▼
+                  ┌─────────────────┐ ┌───────────┐ ┌──────────────┐
+                  │ Document Loader │ │Embeddings │ │  Groq LLM    │
+                  │ PyPDF / Text    │ │ MiniLM-L6 │ │ Llama 3.3 70B│
+                  └────────┬────────┘ └─────┬─────┘ └──────┬───────┘
+                           │                │              ▲
+                           ▼                ▼              │
+                  ┌─────────────────────────────────┐      │
+                  │  RecursiveCharacterTextSplitter │      │
+                  └────────────────┬────────────────┘      │
+                                   │                       │
+                                   ▼                       │
+                  ┌─────────────────────────────────┐      │
+                  │       ChromaDB Vector Store     │──────┘ (Top-K Chunks)
+                  └─────────────────────────────────┘
 ```
 
 ---
 
-# Technologies Used
+## 📁 Repository Structure
 
-## Backend
-
-* Python
-* LangChain
-* LangChain Chroma
-* Groq API
-* ChromaDB
-
-## AI Components
-
-* HuggingFace Sentence Transformers
-* Vector Embeddings
-* Retrieval-Augmented Generation (RAG)
-* Large Language Models (LLMs)
-
-## Document Processing
-
-* PDF Loader
-* Text Loader
-* Markdown Loader
-* Text Splitters
+```
+rag-chat-bot/
+├── backend/
+│   ├── app/
+│   │   ├── main.py              # FastAPI application entrypoint & middleware
+│   │   ├── chatbot.py           # LLM answer generation logic using Groq
+│   │   ├── retriever.py         # Top-K context retrieval pipeline
+│   │   ├── embeddings.py        # HuggingFace sentence-transformers factory
+│   │   ├── vector_store.py      # ChromaDB storage & vector management
+│   │   ├── loaders.py           # PyPDF, TXT & Markdown document loaders
+│   │   ├── splitter.py          # RecursiveCharacterTextSplitter (size=500, overlap=50)
+│   │   ├── prompt.py            # Guardrail RAG prompt templates
+│   │   ├── core/
+│   │   │   └── config.py        # Environment variables & settings
+│   │   ├── models/
+│   │   │   └── schemas.py       # Pydantic request/response schemas
+│   │   ├── routes/
+│   │   │   ├── chat.py          # POST /chat endpoint
+│   │   │   ├── upload.py        # POST /upload endpoint
+│   │   │   ├── health.py        # GET /health endpoint
+│   │   │   └── documents.py     # GET /documents, DELETE /documents endpoints
+│   │   └── services/
+│   │       └── rag_service.py   # RAG Service orchestrator
+│   ├── data/                    # Storage folder for uploaded documents
+│   ├── chroma_db/               # Persistent ChromaDB vector database
+│   ├── requirements.txt         # FastAPI, LangChain, ChromaDB, Groq dependencies
+│   └── run.py                   # Script to run FastAPI server using Uvicorn
+├── frontend/
+│   ├── tsconfig.json            # Main TypeScript configuration
+│   ├── tsconfig.app.json        # Strict React app tsconfig
+│   ├── tsconfig.node.json       # Vite node tsconfig
+│   ├── vite.config.ts           # Vite configuration in TypeScript
+│   ├── package.json             # React 18, TypeScript, Tailwind, Lucide, Axios, react-markdown
+│   └── src/
+│       ├── vite-env.d.ts        # Vite environment types
+│       ├── types/               # chat.ts, document.ts, api.ts
+│       ├── components/          # Navbar.tsx, Sidebar.tsx, ChatArea.tsx, MessageList.tsx, MessageItem.tsx, SourceCitations.tsx, ContextModal.tsx, UploadModal.tsx, DocumentList.tsx, StatsCard.tsx
+│       ├── pages/               # Dashboard.tsx, ChatPage.tsx
+│       ├── hooks/               # useChat.ts, useUpload.ts
+│       ├── services/            # api.ts (Typed Axios API client)
+│       ├── utils/               # formatters.ts
+│       ├── App.tsx
+│       └── main.tsx
+├── frontend_backup_before_typescript_migration/ # Backup directory
+├── docs/                        # Complete technical documentation suite
+│   ├── PRD.md                   # Product Vision, User Stories & Requirements
+│   ├── Architecture.md          # System Architecture & API Design Specs
+│   ├── Rules.md                 # Development Rules & Coding Standards
+│   ├── Phases.md                # Development Roadmap & Phase Tracking
+│   ├── Design.md                # UI/UX Design System & Color Palette
+│   └── Memory.md                # Continuous AI Context Memory Log
+├── tests/                       # Automated pytest suite
+├── docker-compose.yml
+├── backend/Dockerfile
+├── frontend/Dockerfile
+├── .env.example
+└── README.md
+```
 
 ---
 
-# Project Structure
+## 🛠️ Required Software & Versions
 
-```
-rag-document-indexing/
-
-│
-├── data/
-│   ├── guide.pdf
-│   ├── notes.txt
-│   └── tutorial.md
-│
-├── main.py                 # Application entry point
-├── loaders.py              # Document loading logic
-├── splitter.py             # Text chunking logic
-├── embeddings.py           # Embedding model setup
-├── vector_store.py         # ChromaDB creation/loading
-├── retriever.py            # Similarity search logic
-├── prompt.py               # Prompt template
-├── chatbot.py              # Groq LLM integration
-├── experiments.py          # Chunk size experiments
-├── config.py               # Configuration values
-│
-├── chroma_db/              # Persistent vector database
-│
-├── requirements.txt
-├── README.md
-└── .env
-```
+| Software | Required Version | Purpose |
+|---|---|---|
+| **Python** | `3.10` or higher | Backend FastAPI runtime & LangChain pipeline |
+| **Node.js** | `18.0` or higher | Frontend React + TypeScript Vite development server |
+| **TypeScript** | `5.0` or higher | Type-safe frontend compilation |
+| **npm** / **pnpm** | `9.0` or higher | Frontend package management |
+| **Docker** (Optional) | `24.0` or higher | Containerized multi-service execution |
+| **Groq API Key** | Free account at [console.groq.com](https://console.groq.com/) | LLM inference API key |
 
 ---
 
-# Installation
+## 🚀 Quickstart Installation & Setup
 
-## 1. Clone Repository
+### 1. Clone & Configure Environment
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ZarwanZahid42/rag-chat-bot.git
+cd rag-chat-bot
 
-cd rag-document-indexing
+# Copy environment variable template
+cp .env.example .env
+```
+
+Edit your `.env` file and set your `GROQ_API_KEY`:
+
+```env
+GROQ_API_KEY=gsk_your_actual_groq_api_key_here
+CHROMA_DB_PATH=chroma_db
+DATA_FOLDER=data
+DEFAULT_CHUNK_SIZE=500
+CHUNK_OVERLAP=50
+TOP_K=3
+HOST=0.0.0.0
+PORT=8000
 ```
 
 ---
 
-## 2. Create Virtual Environment
+### 2. Backend Setup (FastAPI)
 
 ```bash
+# Create and activate virtual environment
 python -m venv venv
-```
 
-Activate:
-
-### Windows
-
-```powershell
+# On Windows:
 venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r backend/requirements.txt
+
+# Run the FastAPI server
+python backend/run.py
 ```
+
+Swagger API Docs: `http://localhost:8000/docs`
 
 ---
 
-## 3. Install Dependencies
+### 3. Frontend Setup (React 18 + TypeScript)
+
+Open a new terminal window:
 
 ```bash
-pip install -r requirements.txt
+# Navigate to frontend directory
+cd frontend
+
+# Install Node & TypeScript dependencies
+npm install
+
+# Start Vite development server
+npm run dev
+
+# Run TypeScript type checker & production build
+npm run build
 ```
+
+The frontend web app runs at `http://localhost:5173`.
 
 ---
 
-# Environment Variables
+## 🏃 Running Backend and Frontend Together
 
-Create a `.env` file:
+### Option A: Concurrent Development Mode
+Terminal 1 (Backend): `python backend/run.py`
+Terminal 2 (Frontend): `cd frontend && npm run dev`
 
+### Option B: Docker Compose Deployment
+```bash
+docker compose up --build
 ```
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-The API key is used to communicate with Groq LLM models.
+- **Frontend App:** `http://localhost:3000`
+- **Backend API:** `http://localhost:8000`
+- **Swagger Docs:** `http://localhost:8000/docs`
 
 ---
 
-# Running the Application
-
-Start the RAG chatbot:
+## 🧪 Running Automated Tests
 
 ```bash
-python main.py
+pytest tests/
 ```
-
-Example:
-
-```
-RAG Chatbot Ready!
-Type 'exit' to quit.
-
-Enter your question:
-What is artificial intelligence?
-```
-
-Output:
-
-```
-Retrieved Context
------------------
-
-Artificial Intelligence (AI) is transforming industries by enabling machines to perform tasks that typically require human intelligence.
-
-
-AI Answer
----------
-
-Artificial Intelligence is the field of creating machines that can perform tasks requiring human intelligence.
-```
-
----
-
-# How the System Works
-
-## 1. Document Loading
-
-Supported formats:
-
-* PDF
-* TXT
-* Markdown
-
-Example:
-
-```
-data/
- |
- ├── guide.pdf
- ├── notes.txt
- └── tutorial.md
-```
-
-Documents are converted into LangChain Document objects.
-
----
-
-## 2. Text Splitting
-
-Large documents are divided into smaller chunks.
-
-Example:
-
-```
-Original Document
-
-        |
-        ↓
-
-Chunk 1
-Chunk 2
-Chunk 3
-```
-
-Chunking improves retrieval accuracy because the system searches smaller meaningful sections instead of entire documents.
-
----
-
-## 3. Embeddings
-
-Each chunk is converted into a numerical vector representation.
-
-Example:
-
-```
-Text:
-
-"Machine Learning is a subset of AI"
-
-
-Embedding:
-
-[0.234, -0.421, 0.765, ...]
-```
-
-These vectors capture semantic meaning.
-
----
-
-## 4. ChromaDB Storage
-
-The generated embeddings are stored in ChromaDB.
-
-Example:
-
-```
-Vector Database
-
-Vector              Source
---------------------------------
-Embedding 1         notes.txt
-Embedding 2         tutorial.md
-Embedding 3         guide.pdf
-```
-
-The database is persistent, meaning embeddings do not need to be recreated every time.
-
----
-
-## 5. Retrieval
-
-When a user asks a question:
-
-```
-Question:
-
-"What is AI?"
-```
-
-The retriever performs similarity search and finds the most relevant chunks.
-
-Example:
-
-```
-Retrieved:
-
-1. notes.txt
-2. tutorial.md
-3. guide.pdf
-```
-
----
-
-## 6. Context Injection
-
-The retrieved chunks are inserted into the prompt:
-
-```
-Context:
-
-Artificial Intelligence enables machines...
-
-Question:
-
-What is AI?
-```
-
-The LLM receives both the question and supporting information.
-
----
-
-## 7. Response Generation
-
-Groq LLM generates a response based on the retrieved context.
-
-This reduces hallucination because the model answers using the provided documents.
-
----
-
-# Top-K Retrieval Experiment
-
-Top-K controls how many document chunks are retrieved.
-
-Experiments were performed using different values.
-
-## Top-K = 2
-
-* Retrieves fewer chunks.
-* More precise results.
-* Less context.
-
-## Top-K = 4
-
-* Balanced retrieval.
-* Good amount of context.
-* Better overall performance.
-
-## Top-K = 6
-
-* Retrieves more information.
-* May include less relevant chunks.
-
-Final configuration:
-
-```
-TOP_K = 3
-```
-
-because it provides a balance between relevance and available context.
-
----
-
-# Persistent ChromaDB Design
-
-The application separates indexing and retrieval.
-
-First execution:
-
-```
-Documents
-   ↓
-Chunks
-   ↓
-Embeddings
-   ↓
-ChromaDB
-```
-
-Future executions:
-
-```
-Existing ChromaDB
-        ↓
-Load Database
-        ↓
-Start Chatbot
-```
-
-This avoids unnecessary embedding generation.
-
----
-
-# Example Questions
-
-Try:
-
-```
-What is artificial intelligence?
-```
-
-```
-Explain machine learning.
-```
-
-```
-What is RAG?
-```
-
-```
-How does ChromaDB store documents?
-```
-
----
-
-# Future Improvements
-
-Possible extensions:
-
-* Add web interface using React and Tailwind
-* Add streaming responses
-* Add conversation memory
-* Support more document formats
-* Add authentication
-* Add LangSmith tracing and evaluation
-* Deploy using Docker and cloud services
-
----
-
-# Learning Outcomes
-
-Through this project, the following RAG concepts were implemented:
-
-:white_check_mark: Document Loading
-:white_check_mark: Text Chunking
-:white_check_mark: Embeddings
-:white_check_mark: Vector Databases
-:white_check_mark: ChromaDB
-:white_check_mark: Similarity Search
-:white_check_mark: Retrievers
-:white_check_mark: Top-K Retrieval
-:white_check_mark: Prompt Templates
-:white_check_mark: Context Injection
-:white_check_mark: LLM Integration
-:white_check_mark: Complete RAG Workflow
-
----
-
-# Author
-
-Zarwan Zahid
-
-RAG Document Indexing & Chatbot Project

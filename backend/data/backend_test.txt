@@ -1,0 +1,1 @@
+FastAPI, ChromaDB, and Groq LLM power this AI Knowledge Assistant.

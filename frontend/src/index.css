@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply transition-colors duration-200;
+  }
+}
+
+/* Custom Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-700/50 rounded-full hover:bg-slate-600/70 transition-colors;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400;
+}
+
+/* Custom Glassmorphism styles */
+.glass-panel {
+  @apply bg-slate-800/80 backdrop-blur-md border border-slate-700/60 shadow-xl;
+}
+
+.light .glass-panel {
+  @apply bg-white/90 backdrop-blur-md border border-slate-200 shadow-md;
+}
+
+.glass-card {
+  @apply bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 hover:border-indigo-500/50 transition-all duration-200;
+}
+
+.light .glass-card {
+  @apply bg-slate-50 border border-slate-200 hover:border-indigo-300;
+}
+
+/* Pulsing background glow animation */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
